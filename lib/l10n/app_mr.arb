@@ -1,31 +1,121 @@
 {
     "@@locale": "mr",
     "appTitle": "त्रिमूर्ती डेअरी",
+    "@appTitle": {
+        "description": "The application title"
+    },
     "welcomeBack": "पुन्हा स्वागत आहे",
+    "@welcomeBack": {
+        "description": "Welcome message on login screen"
+    },
     "signInContinue": "आपला डेअरी व्यवसाय व्यवस्थापित करण्यासाठी साइन इन करा",
+    "@signInContinue": {
+        "description": "Subtitle on login screen"
+    },
     "emailAddress": "ईमेल पत्ता",
+    "@emailAddress": {
+        "description": "Label for email address field"
+    },
     "enterEmail": "आपला प्रशासक ईमेल प्रविष्ट करा",
+    "@enterEmail": {
+        "description": "Hint for email address field"
+    },
     "password": "पासवर्ड",
+    "@password": {
+        "description": "Label for password field"
+    },
     "enterPassword": "आपला सुरक्षित पासवर्ड प्रविष्ट करा",
+    "@enterPassword": {
+        "description": "Hint for password field"
+    },
     "rememberMe": "माझी आठवण ठेवा",
+    "@rememberMe": {
+        "description": "Label for remember me checkbox"
+    },
     "forgotPassword": "पासवर्ड विसरलात?",
+    "@forgotPassword": {
+        "description": "Label for forgot password button"
+    },
     "signIn": "साइन इन करा",
+    "@signIn": {
+        "description": "Label for sign in button"
+    },
     "authorizedAccessOnly": "केवळ अधिकृत डेअरी कर्मचारी",
+    "@authorizedAccessOnly": {
+        "description": "Security notice on login screen"
+    },
     "emailRequired": "कृपया आपला ईमेल प्रविष्ट करा",
+    "@emailRequired": {
+        "description": "Validation message for empty email"
+    },
     "emailInvalid": "कृपया वैध ईमेल प्रविष्ट करा",
+    "@emailInvalid": {
+        "description": "Validation message for invalid email format"
+    },
     "passwordRequired": "कृपया आपला पासवर्ड प्रविष्ट करा",
+    "@passwordRequired": {
+        "description": "Validation message for empty password"
+    },
     "passwordTooShort": "पासवर्ड किमान 6 वर्ण असणे आवश्यक आहे",
+    "@passwordTooShort": {
+        "description": "Validation message for password too short"
+    },
     "loginFailed": "लॉगिन अयशस्वी",
+    "@loginFailed": {
+        "description": "Title for login failure message"
+    },
     "passwordReset": "पासवर्ड रीसेट",
+    "@passwordReset": {
+        "description": "Title for password reset dialog"
+    },
     "passwordResetSuccess": "पासवर्ड रीसेट ईमेल यशस्वीरित्या पाठवला!",
+    "@passwordResetSuccess": {
+        "description": "Success message for password reset email"
+    },
     "resetFailed": "रीसेट अयशस्वी",
+    "@resetFailed": {
+        "description": "Title for reset failure message"
+    },
     "emailRequiredReset": "ईमेल आवश्यक आहे",
+    "@emailRequiredReset": {
+        "description": "Title for email required dialog in password reset"
+    },
     "enterEmailReset": "कृपया आपला ईमेल पत्ता प्रविष्ट करा",
+    "@enterEmailReset": {
+        "description": "Prompt for email in password reset"
+    },
     "invalidEmail": "अवैध ईमेल",
+    "@invalidEmail": {
+        "description": "Title for invalid email dialog"
+    },
     "enterValidEmail": "कृपया वैध ईमेल पत्ता प्रविष्ट करा",
+    "@enterValidEmail": {
+        "description": "Prompt for valid email"
+    },
     "passwordResetSent": "पासवर्ड रीसेट ईमेल पाठवला",
+    "@passwordResetSent": {
+        "description": "Title for password reset email sent dialog"
+    },
     "passwordResetMessage": "आम्ही {email} वर पासवर्ड रीसेट ईमेल पाठवला आहे",
+    "@passwordResetMessage": {
+        "description": "Message about password reset email being sent",
+        "placeholders": {
+            "email": {
+                "type": "String",
+                "example": "user@example.com"
+            }
+        }
+    },
     "managementPortal": "व्यवस्थापन पोर्टल",
+    "@managementPortal": {
+        "description": "Subtitle for the application"
+    },
     "selectLanguage": "भाषा निवडा",
-    "ok": "ठीक आहे"
+    "@selectLanguage": {
+        "description": "Title for language selection dialog"
+    },
+    "ok": "ठीक आहे",
+    "@ok": {
+        "description": "Standard affirmative button text"
+    }
 }

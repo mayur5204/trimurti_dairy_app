@@ -98,169 +98,169 @@ abstract class AppLocalizations {
     Locale('mr'),
   ];
 
-  /// No description provided for @appTitle.
+  /// The application title
   ///
   /// In en, this message translates to:
   /// **'Trimurti Dairy'**
   String get appTitle;
 
-  /// No description provided for @welcomeBack.
+  /// Welcome message on login screen
   ///
   /// In en, this message translates to:
   /// **'Welcome Back'**
   String get welcomeBack;
 
-  /// No description provided for @signInContinue.
+  /// Subtitle on login screen
   ///
   /// In en, this message translates to:
   /// **'Sign in to continue managing your dairy business'**
   String get signInContinue;
 
-  /// No description provided for @emailAddress.
+  /// Label for email address field
   ///
   /// In en, this message translates to:
   /// **'Email Address'**
   String get emailAddress;
 
-  /// No description provided for @enterEmail.
+  /// Hint for email address field
   ///
   /// In en, this message translates to:
   /// **'Enter your admin email'**
   String get enterEmail;
 
-  /// No description provided for @password.
+  /// Label for password field
   ///
   /// In en, this message translates to:
   /// **'Password'**
   String get password;
 
-  /// No description provided for @enterPassword.
+  /// Hint for password field
   ///
   /// In en, this message translates to:
   /// **'Enter your secure password'**
   String get enterPassword;
 
-  /// No description provided for @rememberMe.
+  /// Label for remember me checkbox
   ///
   /// In en, this message translates to:
   /// **'Remember me'**
   String get rememberMe;
 
-  /// No description provided for @forgotPassword.
+  /// Label for forgot password button
   ///
   /// In en, this message translates to:
   /// **'Forgot Password?'**
   String get forgotPassword;
 
-  /// No description provided for @signIn.
+  /// Label for sign in button
   ///
   /// In en, this message translates to:
   /// **'Sign In'**
   String get signIn;
 
-  /// No description provided for @authorizedAccessOnly.
+  /// Security notice on login screen
   ///
   /// In en, this message translates to:
   /// **'Authorized Dairy Personnel Only'**
   String get authorizedAccessOnly;
 
-  /// No description provided for @emailRequired.
+  /// Validation message for empty email
   ///
   /// In en, this message translates to:
   /// **'Please enter your email'**
   String get emailRequired;
 
-  /// No description provided for @emailInvalid.
+  /// Validation message for invalid email format
   ///
   /// In en, this message translates to:
   /// **'Please enter a valid email'**
   String get emailInvalid;
 
-  /// No description provided for @passwordRequired.
+  /// Validation message for empty password
   ///
   /// In en, this message translates to:
   /// **'Please enter your password'**
   String get passwordRequired;
 
-  /// No description provided for @passwordTooShort.
+  /// Validation message for password too short
   ///
   /// In en, this message translates to:
   /// **'Password must be at least 6 characters'**
   String get passwordTooShort;
 
-  /// No description provided for @loginFailed.
+  /// Title for login failure message
   ///
   /// In en, this message translates to:
   /// **'Login Failed'**
   String get loginFailed;
 
-  /// No description provided for @passwordReset.
+  /// Title for password reset dialog
   ///
   /// In en, this message translates to:
   /// **'Password Reset'**
   String get passwordReset;
 
-  /// No description provided for @passwordResetSuccess.
+  /// Success message for password reset email
   ///
   /// In en, this message translates to:
   /// **'Password reset email sent successfully!'**
   String get passwordResetSuccess;
 
-  /// No description provided for @resetFailed.
+  /// Title for reset failure message
   ///
   /// In en, this message translates to:
   /// **'Reset Failed'**
   String get resetFailed;
 
-  /// No description provided for @emailRequiredReset.
+  /// Title for email required dialog in password reset
   ///
   /// In en, this message translates to:
   /// **'Email Required'**
   String get emailRequiredReset;
 
-  /// No description provided for @enterEmailReset.
+  /// Prompt for email in password reset
   ///
   /// In en, this message translates to:
   /// **'Please enter your email address'**
   String get enterEmailReset;
 
-  /// No description provided for @invalidEmail.
+  /// Title for invalid email dialog
   ///
   /// In en, this message translates to:
   /// **'Invalid Email'**
   String get invalidEmail;
 
-  /// No description provided for @enterValidEmail.
+  /// Prompt for valid email
   ///
   /// In en, this message translates to:
   /// **'Please enter a valid email address'**
   String get enterValidEmail;
 
-  /// No description provided for @passwordResetSent.
+  /// Title for password reset email sent dialog
   ///
   /// In en, this message translates to:
   /// **'Password Reset Email Sent'**
   String get passwordResetSent;
 
-  /// No description provided for @passwordResetMessage.
+  /// Message about password reset email being sent
   ///
   /// In en, this message translates to:
   /// **'We\'ve sent a password reset email to {email}'**
-  String passwordResetMessage(Object email);
+  String passwordResetMessage(String email);
 
-  /// No description provided for @managementPortal.
+  /// Subtitle for the application
   ///
   /// In en, this message translates to:
   /// **'Management Portal'**
   String get managementPortal;
 
-  /// No description provided for @selectLanguage.
+  /// Title for language selection dialog
   ///
   /// In en, this message translates to:
   /// **'Select Language'**
   String get selectLanguage;
 
-  /// No description provided for @ok.
+  /// Standard affirmative button text
   ///
   /// In en, this message translates to:
   /// **'OK'**

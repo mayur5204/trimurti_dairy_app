@@ -4,7 +4,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 import 'firebase_options.dart';
 import 'services/firebase_auth_service.dart';
-import 'services/localization_service.dart';
 import 'controllers/language_controller.dart';
 import 'controllers/login_controller.dart';
 import 'screens/login_screen.dart';

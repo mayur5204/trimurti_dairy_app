@@ -61,7 +61,16 @@ applyTo: '**'
   - Models in `/models`
   - Services in `/services`
   - Language controllers in `/controllers/language_controller.dart`
-
+  ## Performance Optimization
+  - **Color Transparency**: Use `withAlpha()` instead of `withOpacity()` for better performance
+    - `withOpacity()` requires expensive compositing operations
+    - `withAlpha()` modifies the color directly without additional rendering layers
+    - Example: `Colors.blue.withAlpha(128)` instead of `Colors.blue.withOpacity(0.5)`
+    - Convert opacity values: multiply by 255 (0.5 opacity = 127-128 alpha)
+  - **Widget Performance**: 
+    - Use `RepaintBoundary` for complex widgets that repaint frequently
+    - Implement `const` constructors wherever possible
+    - Avoid rebuilding entire widget trees unnecessarily
 ## Development Process
 1. **Analysis**: Understand requirements thoroughly before coding
 2. **Planning**: Outline step-by-step implementation approach

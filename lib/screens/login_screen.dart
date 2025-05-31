@@ -4,69 +4,12 @@ import 'package:flutter/services.dart';
 import '../controllers/login_controller.dart';
 import '../config/app_theme.dart';
 import '../widgets/animated_gradient_button.dart';
+import '../controllers/language_controller.dart';
 
 /// Login screen for dairy owner authentication
 /// This screen provides authentication for admin users only
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
-
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  // Scroll controller to handle keyboard appearance
-  final ScrollController _scrollController = ScrollController();
-
-  // Focus nodes for form fields to track currently focused field
-  final FocusNode _emailFocusNode = FocusNode();
-  final FocusNode _passwordFocusNode = FocusNode();
-
-  // Height of the white background container
-  double _whiteContainerHeight = 500;
-
-  @override
-  void initState() {
-    super.initState();
-
-    // Add listeners to focus nodes to scroll to fields when they gain focus
-    _emailFocusNode.addListener(_handleFocusChange);
-    _passwordFocusNode.addListener(_handleFocusChange);
-
-    // Calculate appropriate white container height based on screen size
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        _whiteContainerHeight = MediaQuery.of(context).size.height * 0.65;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    // Clean up controllers and focus nodes
-    _scrollController.dispose();
-    _emailFocusNode.removeListener(_handleFocusChange);
-    _passwordFocusNode.removeListener(_handleFocusChange);
-    _emailFocusNode.dispose();
-    _passwordFocusNode.dispose();
-    super.dispose();
-  }
-
-  // Handle focus changes to scroll to the currently focused field
-  void _handleFocusChange() {
-    if (_emailFocusNode.hasFocus || _passwordFocusNode.hasFocus) {
-      // Add a slight delay to ensure the keyboard is fully visible
-      Future.delayed(const Duration(milliseconds: 300), () {
-        if (_scrollController.hasClients) {
-          _scrollController.animateTo(
-            _emailFocusNode.hasFocus ? 150 : 220,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          );
-        }
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,10 +20,6 @@ class _LoginScreenState extends State<LoginScreen> {
       permanent: true,
     );
 
-    // Calculate screen size
-    final screenSize = MediaQuery.of(context).size;
-    final keyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
-
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light.copyWith(
         statusBarColor: Colors.transparent,
@@ -89,639 +28,597 @@ class _LoginScreenState extends State<LoginScreen> {
         // Dismiss keyboard when tapping outside of text fields
         onTap: () => FocusScope.of(context).unfocus(),
         child: Scaffold(
-          // Keep resizeToAvoidBottomInset false to prevent UI shifting
+          // Prevent resize when keyboard appears
           resizeToAvoidBottomInset: false,
-          body: Stack(
+          body: _ResponsiveLoginLayout(controller: controller),
+        ),
+      ),
+    );
+  }
+}
+
+/// Responsive layout for login screen that adapts to different screen sizes
+class _ResponsiveLoginLayout extends StatelessWidget {
+  final LoginController controller;
+
+  const _ResponsiveLoginLayout({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final bool isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
+    final bool isSmallScreen = size.height < 600;
+
+    // Use Stack to layer UI elements with fixed positions
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        // 1. Fixed Background - always stays in place
+        Positioned.fill(child: _buildBackground()),
+
+        // 2. Scrolling Content
+        Positioned.fill(
+          child: _buildScrollableContent(
+            context,
+            isKeyboardVisible,
+            isSmallScreen,
+          ),
+        ),
+
+        // 3. Fixed Language Selector - always stays in place
+        Align(
+          alignment: Alignment.bottomRight,
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 20, right: 20),
+            child: _buildLanguageSelector(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Build scrollable content that adapts to keyboard visibility
+  Widget _buildScrollableContent(
+    BuildContext context,
+    bool isKeyboardVisible,
+    bool isSmallScreen,
+  ) {
+    return SafeArea(
+      child: SingleChildScrollView(
+        physics: const ClampingScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
             children: [
-              // Background with gradient
-              _buildBackground(context),
+              // Adapt logo section based on available space
+              if (!isKeyboardVisible || !isSmallScreen)
+                _buildLogoSection()
+              else
+                _buildCompactLogoSection(),
 
-              // Login Content with improved scrolling
-              SafeArea(
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  physics: const BouncingScrollPhysics(),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight:
-                          MediaQuery.of(context).size.height -
-                          MediaQuery.of(context).padding.top,
+              // Main content card
+              _LoginCard(controller: controller),
+
+              // Add bottom padding to ensure form is fully visible with keyboard
+              SizedBox(height: isKeyboardVisible ? 20 : 40),
+
+              // Footer with version info - only show when keyboard is not visible
+              if (!isKeyboardVisible)
+                const Text(
+                  'Trimurti Dairy Management v1.0.0',
+                  style: TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+
+              // Extra space at bottom to account for the FAB
+              const SizedBox(height: 80),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Build the background gradient with subtle pattern
+  Widget _buildBackground() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [AppTheme.darkGreen.withAlpha(242), AppTheme.primaryGreen],
+        ),
+      ),
+      child: IgnorePointer(
+        // Prevents background from intercepting gestures
+        ignoring: true,
+        child: CustomPaint(
+          painter: _GradientPatternPainter(),
+          size: Size.infinite,
+        ),
+      ),
+    );
+  }
+
+  /// Build the logo section for the login screen
+  Widget _buildLogoSection() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 60, bottom: 40),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Logo container with icon
+          Container(
+            width: 90,
+            height: 90,
+            decoration: BoxDecoration(
+              color: Colors.white.withAlpha(38), // 0.15 opacity = 38 alpha
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha(26), // 0.1 opacity = 26 alpha
+                  blurRadius: 20,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: const Center(
+              child: Icon(Icons.grass_rounded, size: 48, color: Colors.white),
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          // Title and subtitle
+          const Text(
+            'Trimurti Dairy',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              letterSpacing: 1.0,
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.white.withAlpha(38), // 0.15 opacity = 38 alpha
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Text(
+              'Management Portal',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Build compact logo section when keyboard is visible
+  Widget _buildCompactLogoSection() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20, bottom: 20),
+      child: Row(
+        children: [
+          // Small logo container
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.white.withAlpha(38), // 0.15 opacity = 38 alpha
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Center(
+              child: Icon(Icons.grass_rounded, size: 24, color: Colors.white),
+            ),
+          ),
+
+          const SizedBox(width: 12),
+
+          // Title and subtitle stacked vertically
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Trimurti Dairy',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+
+              const Text(
+                'Management Portal',
+                style: TextStyle(fontSize: 12, color: Colors.white70),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Build language selector FAB
+  Widget _buildLanguageSelector() {
+    return FloatingActionButton.small(
+      onPressed: _showLanguageSelector,
+      backgroundColor: Colors.white,
+      elevation: 4,
+      child: const Icon(Icons.language, color: AppTheme.primaryGreen),
+    );
+  }
+
+  /// Show bottom sheet for language selection
+  void _showLanguageSelector() {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Row(
+              children: [
+                Icon(Icons.language, color: AppTheme.primaryGreen),
+                SizedBox(width: 12),
+                Text(
+                  'Select Language',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            const Divider(),
+            _buildLanguageOption(
+              name: 'English',
+              code: 'en',
+              iconPath: 'assets/images/flags/en.png',
+            ),
+            _buildLanguageOption(
+              name: 'मराठी',
+              code: 'mr',
+              iconPath: 'assets/images/flags/mr.png',
+            ),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
+
+  /// Build individual language option
+  Widget _buildLanguageOption({
+    required String name,
+    required String code,
+    required String iconPath,
+  }) {
+    final languageController = Get.find<LanguageController>();
+
+    return Obx(
+      () => ListTile(
+        contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+        leading: const CircleAvatar(
+          backgroundColor: AppTheme.lightGreyColor,
+          child: Icon(Icons.language, color: AppTheme.primaryGreen),
+        ),
+        title: Text(
+          name,
+          style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+        ),
+        trailing: languageController.currentLanguageCode == code
+            ? const Icon(Icons.check_circle, color: AppTheme.primaryGreen)
+            : null,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        onTap: () {
+          // Change language using the controller
+          languageController.changeLanguage(code);
+          Get.back();
+        },
+      ),
+    );
+  }
+}
+
+/// Main login card with form fields and buttons
+class _LoginCard extends StatelessWidget {
+  final LoginController controller;
+
+  const _LoginCard({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 8,
+      shadowColor: Colors.black26,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Form(
+          key: controller.formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Welcome header
+              const Text(
+                'Welcome Back',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.darkGreyColor,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Sign in to continue to your account',
+                style: TextStyle(color: AppTheme.greyColor, fontSize: 14),
+              ),
+              const SizedBox(height: 24),
+
+              // Email field
+              TextFormField(
+                controller: controller.emailController,
+                keyboardType: TextInputType.emailAddress,
+                textInputAction: TextInputAction.next,
+                autocorrect: false,
+                decoration: InputDecoration(
+                  labelText: 'Email Address',
+                  hintText: 'Enter your admin email',
+                  prefixIcon: const Icon(Icons.email_outlined),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your email';
+                  }
+                  if (!GetUtils.isEmail(value)) {
+                    return 'Please enter a valid email';
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 20),
+
+              // Password field
+              Obx(
+                () => TextFormField(
+                  controller: controller.passwordController,
+                  obscureText: controller.obscurePassword,
+                  textInputAction: TextInputAction.done,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    hintText: 'Enter your secure password',
+                    prefixIcon: const Icon(Icons.lock_outline),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        controller.obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                      ),
+                      onPressed: controller.togglePasswordVisibility,
                     ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Logo and header section - smaller when keyboard is visible
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          height: keyboardVisible
-                              ? screenSize.height * 0.15
-                              : null,
-                          child: keyboardVisible
-                              ? _buildCompactHeader()
-                              : _buildHeaderSection(),
-                        ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your password';
+                    }
+                    if (value.length < 6) {
+                      return 'Password must be at least 6 characters';
+                    }
+                    return null;
+                  },
+                  onFieldSubmitted: (_) => _attemptLogin(),
+                ),
+              ),
 
-                        // Login form
-                        _buildLoginForm(controller),
+              const SizedBox(height: 12),
+
+              // Remember me and forgot password
+              Row(
+                children: [
+                  // Remember me checkbox
+                  Obx(
+                    () => Checkbox(
+                      value: controller.rememberMe,
+                      onChanged: controller.toggleRememberMe,
+                      activeColor: AppTheme.primaryGreen,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                  const Text('Remember me', style: TextStyle(fontSize: 14)),
+
+                  const Spacer(),
+
+                  // Forgot password button
+                  TextButton(
+                    onPressed: controller.handlePasswordReset,
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                    ),
+                    child: const Text(
+                      'Forgot Password?',
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 24),
+
+              // Sign in button
+              Obx(
+                () => AnimatedGradientButton(
+                  onPressed: controller.isLoading ? null : _attemptLogin,
+                  isLoading: controller.isLoading,
+                  text: 'Sign In',
+                  gradient: const LinearGradient(
+                    colors: [AppTheme.darkGreen, AppTheme.primaryGreen],
+                  ),
+                  height: 54,
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Error message box
+              Obx(
+                () => Visibility(
+                  visible: controller.error.isNotEmpty,
+                  child: Container(
+                    margin: const EdgeInsets.only(top: 8),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.red.shade200),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          color: Colors.red,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            controller.error,
+                            style: TextStyle(
+                              color: Colors.red.shade700,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ),
               ),
 
-              // Language selector button - small flag button at the bottom corner
-              Positioned(
-                bottom: 16,
-                right: 16,
-                child: _buildLanguageSelector(),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+              const SizedBox(height: 16),
 
-  /// Builds a compact header when keyboard is visible
-  Widget _buildCompactHeader() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 10, 24, 5),
-      child: Row(
-        children: [
-          // Logo container
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: const Icon(
-              Icons.grass_rounded,
-              size: 24,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(width: 12),
-          // App title
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Trimurti Dairy',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              const Text(
-                'Management Portal',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w300,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Builds the background with gradient and pattern overlay
-  Widget _buildBackground(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
-
-    // Adjust white container height when keyboard is visible
-    final whiteContainerHeight = isKeyboardVisible
-        ? screenSize.height * 0.75
-        : _whiteContainerHeight;
-
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFF2C8D3D), // Dark green
-            Color(0xFF4CAF50), // Primary green
-          ],
-          stops: [0.0, 0.7],
-        ),
-      ),
-      child: Stack(
-        children: [
-          // Curved patterns
-          Positioned.fill(child: CustomPaint(painter: CurvedPatternPainter())),
-
-          // White bottom section - responsive height
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: whiteContainerHeight,
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(40),
-                  topRight: Radius.circular(40),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Builds the header section with logo and title
-  Widget _buildHeaderSection() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(24, 40, 24, 20),
-      child: Column(
-        children: [
-          // Logo container
-          Container(
-            width: 96,
-            height: 96,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(30),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: const Icon(
-              Icons.grass_rounded,
-              size: 50,
-              color: Colors.white,
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // App title
-          const Text(
-            'Trimurti Dairy',
-            style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-              letterSpacing: 0.5,
-            ),
-          ),
-
-          const SizedBox(height: 6),
-
-          // Subtitle
-          const Text(
-            'Management Portal',
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.white,
-              fontWeight: FontWeight.w300,
-              letterSpacing: 1.0,
-            ),
-          ),
-
-          const SizedBox(height: 20),
-        ],
-      ),
-    );
-  }
-
-  /// Builds the login form
-  Widget _buildLoginForm(LoginController controller) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Form(
-        key: controller.formKey,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Welcome text
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 20),
-                Text(
-                  'Welcome Back',
-                  style: AppTheme.headingStyle.copyWith(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Sign in to continue managing your dairy business',
-                  style: TextStyle(color: AppTheme.greyColor, fontSize: 16),
-                ),
-                const SizedBox(height: 30),
-              ],
-            ),
-
-            // Form fields
-            Column(
-              children: [
-                // Email field with animation
-                _AnimatedFormField(
-                  controller: controller.emailController,
-                  labelText: 'Email Address',
-                  hintText: 'Enter your admin email',
-                  prefixIcon: Icons.email_outlined,
-                  keyboardType: TextInputType.emailAddress,
-                  focusNode: _emailFocusNode,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    }
-                    if (!GetUtils.isEmail(value)) {
-                      return 'Please enter a valid email';
-                    }
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 20),
-
-                // Password field with animation
-                Obx(
-                  () => _AnimatedFormField(
-                    controller: controller.passwordController,
-                    labelText: 'Password',
-                    hintText: 'Enter your secure password',
-                    prefixIcon: Icons.lock_outline,
-                    focusNode: _passwordFocusNode,
-                    obscureText: controller.obscurePassword,
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        controller.obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                        color: AppTheme.greyColor.withOpacity(0.8),
-                      ),
-                      onPressed: controller.togglePasswordVisibility,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
-                      }
-                      if (value.length < 6) {
-                        return 'Password must be at least 6 characters';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-              ],
-            ),
-
-            // Remember me and forgot password
-            Row(
-              children: [
-                Obx(
-                  () => Row(
-                    children: [
-                      Transform.scale(
-                        scale: 0.9,
-                        child: Checkbox(
-                          value: controller.rememberMe,
-                          onChanged: controller.toggleRememberMe,
-                          activeColor: AppTheme.primaryGreen,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                      ),
-                      const Text(
-                        'Remember me',
-                        style: TextStyle(
-                          color: AppTheme.greyColor,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const Spacer(),
-
-                TextButton(
-                  onPressed: controller.handlePasswordReset,
-                  child: const Text(
-                    'Forgot Password?',
+              // Security notice
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.only(top: 8),
+                  child: Text(
+                    'Authorized Dairy Personnel Only',
+                    textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: AppTheme.primaryGreen,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
+                      color: AppTheme.greyColor,
+                      fontSize: 13,
+                      fontStyle: FontStyle.italic,
                     ),
                   ),
                 ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            // Login button
-            Obx(
-              () => AnimatedGradientButton(
-                onPressed: controller.isLoading
-                    ? null
-                    : controller.handleSignIn,
-                isLoading: controller.isLoading,
-                text: 'Sign In',
-                gradient: const LinearGradient(
-                  colors: [AppTheme.darkGreen, AppTheme.primaryGreen],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ),
               ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Error message area
-            Obx(
-              () => controller.error.isNotEmpty
-                  ? Container(
-                      padding: const EdgeInsets.all(10),
-                      margin: const EdgeInsets.only(bottom: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.red.shade50,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.red.shade200),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.error_outline,
-                            color: Colors.red,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              controller.error,
-                              style: const TextStyle(
-                                color: Colors.red,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-            ),
-
-            // Admin notice
-            Container(
-              alignment: Alignment.center,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: const Text(
-                'Authorized Dairy Personnel Only',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: AppTheme.greyColor,
-                  fontStyle: FontStyle.italic,
-                  fontSize: 13,
-                ),
-              ),
-            ),
-
-            // Add extra padding at bottom to ensure all content is accessible
-            SizedBox(
-              height: MediaQuery.of(context).viewInsets.bottom > 0 ? 150 : 10,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// Builds the language selector button
-  Widget _buildLanguageSelector() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(40),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            ],
           ),
-        ],
-      ),
-      child: IconButton(
-        icon: const Icon(
-          Icons.language,
-          color: AppTheme.primaryGreen,
-          size: 22,
         ),
-        onPressed: () {
-          // Will be implemented with language controller
-          Get.bottomSheet(
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    'Select Language',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 20),
-                  _buildLanguageOption('English', 'en'),
-                  _buildLanguageOption('मराठी', 'mr'),
-                ],
-              ),
-            ),
-          );
-        },
       ),
     );
   }
 
-  /// Builds a language option item
-  Widget _buildLanguageOption(String name, String code) {
-    return ListTile(
-      title: Text(name),
-      onTap: () {
-        // Get.find<LanguageController>().changeLanguage(code);
-        Get.back();
-      },
-    );
+  /// Attempt to login using the controller
+  void _attemptLogin() {
+    if (controller.formKey.currentState?.validate() ?? false) {
+      controller.handleSignIn();
+    }
   }
 }
 
-/// Animated form field for enhanced user experience
-class _AnimatedFormField extends StatelessWidget {
-  final TextEditingController controller;
-  final String labelText;
-  final String hintText;
-  final IconData prefixIcon;
-  final Widget? suffixIcon;
-  final bool obscureText;
-  final TextInputType keyboardType;
-  final String? Function(String?)? validator;
-  final FocusNode? focusNode;
-
-  const _AnimatedFormField({
-    required this.controller,
-    required this.labelText,
-    required this.hintText,
-    required this.prefixIcon,
-    this.suffixIcon,
-    this.obscureText = false,
-    this.keyboardType = TextInputType.text,
-    this.validator,
-    this.focusNode,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      focusNode: focusNode,
-      obscureText: obscureText,
-      keyboardType: keyboardType,
-      style: const TextStyle(
-        color: AppTheme.darkGreyColor,
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
-      ),
-      decoration: InputDecoration(
-        labelText: labelText,
-        hintText: hintText,
-        hintStyle: TextStyle(color: AppTheme.greyColor.withOpacity(0.7)),
-        prefixIcon: Icon(
-          prefixIcon,
-          color: AppTheme.greyColor.withOpacity(0.8),
-          size: 22,
-        ),
-        suffixIcon: suffixIcon,
-        filled: true,
-        fillColor: Colors.grey.shade50,
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppTheme.primaryGreen, width: 2),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.red.shade400, width: 1),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.red.shade600, width: 2),
-        ),
-        floatingLabelStyle: const TextStyle(color: AppTheme.primaryGreen),
-        contentPadding: const EdgeInsets.symmetric(
-          vertical: 16,
-          horizontal: 16,
-        ),
-      ),
-      validator: validator,
-    );
-  }
-}
-
-/// Custom painter for creating curved background patterns
-class CurvedPatternPainter extends CustomPainter {
+/// Custom pattern painter for the background
+class _GradientPatternPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.15)
+      ..color = Colors.white
+          .withAlpha(26) // 0.1 opacity = 26 alpha
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
+      ..strokeWidth = 1.2;
 
-    final Path firstWavePath = Path();
-    firstWavePath.moveTo(0, size.height * 0.25);
+    // Draw several wave patterns
+    for (int i = 0; i < 3; i++) {
+      final path = Path();
+      final startY = size.height * (0.2 + 0.1 * i);
 
-    // Create a flowing wave pattern
-    firstWavePath.quadraticBezierTo(
-      size.width * 0.25,
-      size.height * 0.15,
-      size.width * 0.5,
-      size.height * 0.25,
-    );
+      path.moveTo(0, startY);
 
-    firstWavePath.quadraticBezierTo(
-      size.width * 0.75,
-      size.height * 0.35,
-      size.width,
-      size.height * 0.25,
-    );
+      // Create a flowing wave pattern
+      path.quadraticBezierTo(
+        size.width * 0.2,
+        startY - size.height * 0.05,
+        size.width * 0.4,
+        startY,
+      );
 
-    canvas.drawPath(firstWavePath, paint);
+      path.quadraticBezierTo(
+        size.width * 0.6,
+        startY + size.height * 0.05,
+        size.width * 0.8,
+        startY,
+      );
 
-    // Second wave
-    final Path secondWavePath = Path();
-    secondWavePath.moveTo(0, size.height * 0.35);
+      path.quadraticBezierTo(
+        size.width * 0.9,
+        startY - size.height * 0.025,
+        size.width,
+        startY,
+      );
 
-    secondWavePath.quadraticBezierTo(
-      size.width * 0.2,
-      size.height * 0.45,
-      size.width * 0.5,
-      size.height * 0.35,
-    );
+      canvas.drawPath(path, paint);
+    }
 
-    secondWavePath.quadraticBezierTo(
-      size.width * 0.8,
-      size.height * 0.25,
-      size.width,
-      size.height * 0.35,
-    );
-
-    canvas.drawPath(secondWavePath, paint);
-
-    // Circle elements
+    // Draw decorative circles
     final circlePaint = Paint()
-      ..color = Colors.white.withOpacity(0.1)
+      ..color = Colors.white
+          .withAlpha(18) // 0.07 opacity = 18 alpha
       ..style = PaintingStyle.fill;
 
     canvas.drawCircle(
-      Offset(size.width * 0.15, size.height * 0.15),
+      Offset(size.width * 0.1, size.height * 0.1),
+      20,
+      circlePaint,
+    );
+
+    canvas.drawCircle(
+      Offset(size.width * 0.8, size.height * 0.2),
       30,
       circlePaint,
     );
 
     canvas.drawCircle(
-      Offset(size.width * 0.85, size.height * 0.4),
-      25,
-      circlePaint,
-    );
-
-    canvas.drawCircle(
-      Offset(size.width * 0.7, size.height * 0.1),
+      Offset(size.width * 0.3, size.height * 0.3),
       15,
       circlePaint,
     );
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

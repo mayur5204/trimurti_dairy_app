@@ -1,31 +1,121 @@
 {
     "@@locale": "en",
     "appTitle": "Trimurti Dairy",
+    "@appTitle": {
+        "description": "The application title"
+    },
     "welcomeBack": "Welcome Back",
+    "@welcomeBack": {
+        "description": "Welcome message on login screen"
+    },
     "signInContinue": "Sign in to continue managing your dairy business",
+    "@signInContinue": {
+        "description": "Subtitle on login screen"
+    },
     "emailAddress": "Email Address",
+    "@emailAddress": {
+        "description": "Label for email address field"
+    },
     "enterEmail": "Enter your admin email",
+    "@enterEmail": {
+        "description": "Hint for email address field"
+    },
     "password": "Password",
+    "@password": {
+        "description": "Label for password field"
+    },
     "enterPassword": "Enter your secure password",
+    "@enterPassword": {
+        "description": "Hint for password field"
+    },
     "rememberMe": "Remember me",
+    "@rememberMe": {
+        "description": "Label for remember me checkbox"
+    },
     "forgotPassword": "Forgot Password?",
+    "@forgotPassword": {
+        "description": "Label for forgot password button"
+    },
     "signIn": "Sign In",
+    "@signIn": {
+        "description": "Label for sign in button"
+    },
     "authorizedAccessOnly": "Authorized Dairy Personnel Only",
+    "@authorizedAccessOnly": {
+        "description": "Security notice on login screen"
+    },
     "emailRequired": "Please enter your email",
+    "@emailRequired": {
+        "description": "Validation message for empty email"
+    },
     "emailInvalid": "Please enter a valid email",
+    "@emailInvalid": {
+        "description": "Validation message for invalid email format"
+    },
     "passwordRequired": "Please enter your password",
+    "@passwordRequired": {
+        "description": "Validation message for empty password"
+    },
     "passwordTooShort": "Password must be at least 6 characters",
+    "@passwordTooShort": {
+        "description": "Validation message for password too short"
+    },
     "loginFailed": "Login Failed",
+    "@loginFailed": {
+        "description": "Title for login failure message"
+    },
     "passwordReset": "Password Reset",
+    "@passwordReset": {
+        "description": "Title for password reset dialog"
+    },
     "passwordResetSuccess": "Password reset email sent successfully!",
+    "@passwordResetSuccess": {
+        "description": "Success message for password reset email"
+    },
     "resetFailed": "Reset Failed",
+    "@resetFailed": {
+        "description": "Title for reset failure message"
+    },
     "emailRequiredReset": "Email Required",
+    "@emailRequiredReset": {
+        "description": "Title for email required dialog in password reset"
+    },
     "enterEmailReset": "Please enter your email address",
+    "@enterEmailReset": {
+        "description": "Prompt for email in password reset"
+    },
     "invalidEmail": "Invalid Email",
+    "@invalidEmail": {
+        "description": "Title for invalid email dialog"
+    },
     "enterValidEmail": "Please enter a valid email address",
+    "@enterValidEmail": {
+        "description": "Prompt for valid email"
+    },
     "passwordResetSent": "Password Reset Email Sent",
+    "@passwordResetSent": {
+        "description": "Title for password reset email sent dialog"
+    },
     "passwordResetMessage": "We've sent a password reset email to {email}",
+    "@passwordResetMessage": {
+        "description": "Message about password reset email being sent",
+        "placeholders": {
+            "email": {
+                "type": "String",
+                "example": "user@example.com"
+            }
+        }
+    },
     "managementPortal": "Management Portal",
+    "@managementPortal": {
+        "description": "Subtitle for the application"
+    },
     "selectLanguage": "Select Language",
-    "ok": "OK"
+    "@selectLanguage": {
+        "description": "Title for language selection dialog"
+    },
+    "ok": "OK",
+    "@ok": {
+        "description": "Standard affirmative button text"
+    }
 }

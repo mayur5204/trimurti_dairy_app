@@ -82,7 +82,7 @@ class AppLocalizationsMr extends AppLocalizations {
   String get passwordResetSent => 'पासवर्ड रीसेट ईमेल पाठवला';
 
   @override
-  String passwordResetMessage(Object email) {
+  String passwordResetMessage(String email) {
     return 'आम्ही $email वर पासवर्ड रीसेट ईमेल पाठवला आहे';
   }
 
