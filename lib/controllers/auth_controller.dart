@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../services/firebase_auth_service.dart';
 
 class AuthController extends GetxController {
@@ -129,22 +130,51 @@ class AuthController extends GetxController {
     }
   }
 
+  // Constants for secure storage keys
+  static const String _emailKey = 'dairy_app_email';
+  static const String _rememberMeKey = 'dairy_app_remember_me';
+  
+  // Instance of secure storage
+  final _secureStorage = const FlutterSecureStorage();
+
   // Load saved credentials
   Future<void> _loadSavedCredentials() async {
-    // TODO: Implement with flutter_secure_storage
-    // For now, just a placeholder
+    try {
+      final savedEmail = await _secureStorage.read(key: _emailKey);
+      final savedRememberMe = await _secureStorage.read(key: _rememberMeKey);
+      
+      if (savedEmail != null && savedRememberMe == 'true') {
+        emailController.text = savedEmail;
+        rememberMe.value = true;
+      }
+    } catch (e) {
+      // Handle any storage access errors silently
+      debugPrint('Error loading credentials: ${e.toString()}');
+    }
   }
 
   // Save credentials
   Future<void> _saveCredentials() async {
-    // TODO: Implement with flutter_secure_storage
-    // For now, just a placeholder
+    try {
+      // Only save email for security reasons
+      await _secureStorage.write(key: _emailKey, value: emailController.text.trim());
+      await _secureStorage.write(key: _rememberMeKey, value: 'true');
+    } catch (e) {
+      debugPrint('Error saving credentials: ${e.toString()}');
+      // Don't expose this error to the user as it's not critical
+    }
   }
 
   // Clear saved credentials
   Future<void> _clearSavedCredentials() async {
-    // TODO: Implement with flutter_secure_storage
-    // For now, just a placeholder
+    try {
+      // Remove specific keys rather than deleting all storage
+      await _secureStorage.delete(key: _emailKey);
+      await _secureStorage.delete(key: _rememberMeKey);
+    } catch (e) {
+      debugPrint('Error clearing credentials: ${e.toString()}');
+      // Don't expose this error to the user as it's not critical
+    }
   }
 
   // Get user-friendly error message
