@@ -50,8 +50,9 @@ class LanguageController extends GetxController {
       await updateLanguage(langCode);
       await saveLanguagePreference(langCode);
 
-      // Refresh the UI
-      Get.forceAppUpdate();
+      // Force update the entire app to apply new locale
+      Get.updateLocale(Locale(langCode));
+      update(); // Update GetBuilder widgets
     }
   }
 

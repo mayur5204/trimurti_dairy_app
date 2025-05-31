@@ -8,6 +8,7 @@ import 'controllers/language_controller.dart';
 import 'controllers/login_controller.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
+import 'l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,16 +29,23 @@ class DairyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return GetMaterialApp(
-      title: 'Dairy App',
-      debugShowCheckedModeBanner: false,
-      initialRoute: '/',
-      getPages: [
-        GetPage(name: '/', page: () => const AuthWrapper()),
-        GetPage(name: '/login', page: () => const LoginScreen()),
-        GetPage(name: '/home', page: () => const HomeScreen()),
-      ],
-      theme: ThemeData(
+    return GetBuilder<LanguageController>(
+      builder: (languageController) => GetMaterialApp(
+        title: 'Trimurti Dairy',
+        debugShowCheckedModeBanner: false,
+        
+        // Localization configuration
+        locale: Locale(languageController.currentLanguageCode),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        
+        initialRoute: '/',
+        getPages: [
+          GetPage(name: '/', page: () => const AuthWrapper()),
+          GetPage(name: '/login', page: () => const LoginScreen()),
+          GetPage(name: '/home', page: () => const HomeScreen()),
+        ],
+        theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.green,
           brightness: Brightness.light,
@@ -92,6 +100,7 @@ class DairyApp extends ConsumerWidget {
         ),
       ),
       themeMode: ThemeMode.system,
+      ),
     );
   }
 }

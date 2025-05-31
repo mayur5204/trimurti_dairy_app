@@ -5,6 +5,7 @@ import '../controllers/login_controller.dart';
 import '../config/app_theme.dart';
 import '../widgets/animated_gradient_button.dart';
 import '../controllers/language_controller.dart';
+import '../l10n/app_localizations.dart';
 
 /// Login screen for dairy owner authentication
 /// This screen provides authentication for admin users only
@@ -38,11 +39,16 @@ class LoginScreen extends StatelessWidget {
 }
 
 /// Responsive layout for login screen that adapts to different screen sizes
-class _ResponsiveLoginLayout extends StatelessWidget {
+class _ResponsiveLoginLayout extends StatefulWidget {
   final LoginController controller;
 
   const _ResponsiveLoginLayout({required this.controller});
 
+  @override
+  State<_ResponsiveLoginLayout> createState() => _ResponsiveLoginLayoutState();
+}
+
+class _ResponsiveLoginLayoutState extends State<_ResponsiveLoginLayout> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -65,13 +71,11 @@ class _ResponsiveLoginLayout extends StatelessWidget {
           ),
         ),
 
-        // 3. Fixed Language Selector - always stays in place
-        Align(
-          alignment: Alignment.bottomRight,
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 20, right: 20),
-            child: _buildLanguageSelector(),
-          ),
+        // 3. Fixed Language Selector - moved to top-right corner
+        Positioned(
+          top: MediaQuery.of(context).padding.top + 16,
+          right: 20,
+          child: _buildLanguageSelector(),
         ),
       ],
     );
@@ -97,7 +101,7 @@ class _ResponsiveLoginLayout extends StatelessWidget {
                 _buildCompactLogoSection(),
 
               // Main content card
-              _LoginCard(controller: controller),
+              _LoginCard(controller: widget.controller),
 
               // Add bottom padding to ensure form is fully visible with keyboard
               SizedBox(height: isKeyboardVisible ? 20 : 40),
@@ -109,8 +113,8 @@ class _ResponsiveLoginLayout extends StatelessWidget {
                   style: TextStyle(color: Colors.white70, fontSize: 12),
                 ),
 
-              // Extra space at bottom to account for the FAB
-              const SizedBox(height: 80),
+              // Bottom spacing
+              const SizedBox(height: 40),
             ],
           ),
         ),
@@ -169,13 +173,15 @@ class _ResponsiveLoginLayout extends StatelessWidget {
           const SizedBox(height: 24),
 
           // Title and subtitle
-          const Text(
-            'Trimurti Dairy',
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-              letterSpacing: 1.0,
+          Builder(
+            builder: (context) => Text(
+              AppLocalizations.of(context)?.appTitle ?? 'Trimurti Dairy',
+              style: const TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                letterSpacing: 1.0,
+              ),
             ),
           ),
 
@@ -187,12 +193,15 @@ class _ResponsiveLoginLayout extends StatelessWidget {
               color: Colors.white.withAlpha(38), // 0.15 opacity = 38 alpha
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Text(
-              'Management Portal',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
+            child: Builder(
+              builder: (context) => Text(
+                AppLocalizations.of(context)?.managementPortal ??
+                    'Management Portal',
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ),
@@ -226,18 +235,23 @@ class _ResponsiveLoginLayout extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Trimurti Dairy',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+              Builder(
+                builder: (context) => Text(
+                  AppLocalizations.of(context)?.appTitle ?? 'Trimurti Dairy',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
 
-              const Text(
-                'Management Portal',
-                style: TextStyle(fontSize: 12, color: Colors.white70),
+              Builder(
+                builder: (context) => Text(
+                  AppLocalizations.of(context)?.managementPortal ??
+                      'Management Portal',
+                  style: const TextStyle(fontSize: 12, color: Colors.white70),
+                ),
               ),
             ],
           ),
@@ -246,87 +260,238 @@ class _ResponsiveLoginLayout extends StatelessWidget {
     );
   }
 
-  /// Build language selector FAB
+  /// Build language selector button for top-right corner
   Widget _buildLanguageSelector() {
-    return FloatingActionButton.small(
-      onPressed: _showLanguageSelector,
-      backgroundColor: Colors.white,
-      elevation: 4,
-      child: const Icon(Icons.language, color: AppTheme.primaryGreen),
-    );
-  }
-
-  /// Show bottom sheet for language selection
-  void _showLanguageSelector() {
-    Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Row(
-              children: [
-                Icon(Icons.language, color: AppTheme.primaryGreen),
-                SizedBox(width: 12),
-                Text(
-                  'Select Language',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    return GetBuilder<LanguageController>(
+      builder: (languageController) => Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: _showLanguageSelector,
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white.withAlpha(51), // 0.2 opacity = 51 alpha
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Colors.white.withAlpha(77), // 0.3 opacity = 77 alpha
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha(26), // 0.1 opacity = 26 alpha
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            const Divider(),
-            _buildLanguageOption(
-              name: 'English',
-              code: 'en',
-              iconPath: 'assets/images/flags/en.png',
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.language, color: Colors.white, size: 18),
+                const SizedBox(width: 6),
+                Text(
+                  languageController.currentLanguageCode.toUpperCase(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Icon(Icons.keyboard_arrow_down, color: Colors.white, size: 16),
+              ],
             ),
-            _buildLanguageOption(
-              name: 'मराठी',
-              code: 'mr',
-              iconPath: 'assets/images/flags/mr.png',
-            ),
-          ],
+          ),
         ),
       ),
-      isScrollControlled: true,
     );
   }
 
-  /// Build individual language option
-  Widget _buildLanguageOption({
+  /// Show dropdown menu for language selection in top-right corner
+  void _showLanguageSelector() {
+    // Calculate position for top-right corner popup
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double safeAreaTop = MediaQuery.of(context).padding.top;
+
+    showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        screenWidth - 200, // Right-aligned with some margin
+        safeAreaTop + 60, // Below the button with safe area
+        20, // Right margin
+        screenHeight - 300, // Bottom constraint
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 12,
+      color: Colors.white,
+      items: [
+        // Header item
+        PopupMenuItem<String>(
+          enabled: false,
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryGreen.withAlpha(26), // 0.1 opacity
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.language,
+                    color: AppTheme.primaryGreen,
+                    size: 18,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Builder(
+                  builder: (context) => Text(
+                    AppLocalizations.of(context)?.selectLanguage ??
+                        'Select Language',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.darkGreyColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        // Divider
+        PopupMenuItem<String>(
+          enabled: false,
+          height: 1,
+          child: Divider(
+            color: AppTheme.lightGreyColor,
+            height: 1,
+            thickness: 1,
+          ),
+        ),
+
+        // English option
+        _buildPopupLanguageOption(
+          name: 'English',
+          code: 'en',
+          nativeName: 'English',
+          flag: '🇺🇸',
+        ),
+
+        // Marathi option
+        _buildPopupLanguageOption(
+          name: 'मराठी',
+          code: 'mr',
+          nativeName: 'Marathi',
+          flag: '🇮🇳',
+        ),
+      ],
+    ).then((selectedLang) {
+      if (selectedLang != null) {
+        final languageController = Get.find<LanguageController>();
+        languageController.changeLanguage(selectedLang);
+      }
+    });
+  }
+
+  /// Build individual popup language option with enhanced design
+  PopupMenuItem<String> _buildPopupLanguageOption({
     required String name,
     required String code,
-    required String iconPath,
+    required String nativeName,
+    required String flag,
   }) {
-    final languageController = Get.find<LanguageController>();
+    return PopupMenuItem<String>(
+      value: code,
+      child: GetBuilder<LanguageController>(
+        builder: (languageController) {
+          final bool isSelected =
+              languageController.currentLanguageCode == code;
 
-    return Obx(
-      () => ListTile(
-        contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-        leading: const CircleAvatar(
-          backgroundColor: AppTheme.lightGreyColor,
-          child: Icon(Icons.language, color: AppTheme.primaryGreen),
-        ),
-        title: Text(
-          name,
-          style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
-        ),
-        trailing: languageController.currentLanguageCode == code
-            ? const Icon(Icons.check_circle, color: AppTheme.primaryGreen)
-            : null,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        onTap: () {
-          // Change language using the controller
-          languageController.changeLanguage(code);
-          Get.back();
+          return Container(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? AppTheme.primaryGreen.withAlpha(26) // 0.1 opacity
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                // Flag container
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: isSelected
+                          ? AppTheme.primaryGreen.withAlpha(77) // 0.3 opacity
+                          : Colors.grey.shade300,
+                      width: 1,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(flag, style: const TextStyle(fontSize: 16)),
+                  ),
+                ),
+
+                const SizedBox(width: 12),
+
+                // Language info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        name,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: isSelected
+                              ? FontWeight.w600
+                              : FontWeight.w500,
+                          color: isSelected
+                              ? AppTheme.primaryGreen
+                              : AppTheme.darkGreyColor,
+                        ),
+                      ),
+                      if (name != nativeName)
+                        Text(
+                          nativeName,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: AppTheme.greyColor,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+
+                // Selection indicator
+                if (isSelected)
+                  Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryGreen,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.check,
+                      color: Colors.white,
+                      size: 12,
+                    ),
+                  ),
+              ],
+            ),
+          );
         },
       ),
     );
@@ -345,199 +510,232 @@ class _LoginCard extends StatelessWidget {
       elevation: 8,
       shadowColor: Colors.black26,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Form(
-          key: controller.formKey,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Welcome header
-              const Text(
-                'Welcome Back',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.darkGreyColor,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Sign in to continue to your account',
-                style: TextStyle(color: AppTheme.greyColor, fontSize: 14),
-              ),
-              const SizedBox(height: 24),
-
-              // Email field
-              TextFormField(
-                controller: controller.emailController,
-                keyboardType: TextInputType.emailAddress,
-                textInputAction: TextInputAction.next,
-                autocorrect: false,
-                decoration: InputDecoration(
-                  labelText: 'Email Address',
-                  hintText: 'Enter your admin email',
-                  prefixIcon: const Icon(Icons.email_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
-                  }
-                  if (!GetUtils.isEmail(value)) {
-                    return 'Please enter a valid email';
-                  }
-                  return null;
-                },
-              ),
-
-              const SizedBox(height: 20),
-
-              // Password field
-              Obx(
-                () => TextFormField(
-                  controller: controller.passwordController,
-                  obscureText: controller.obscurePassword,
-                  textInputAction: TextInputAction.done,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    hintText: 'Enter your secure password',
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        controller.obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                      ),
-                      onPressed: controller.togglePasswordVisibility,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
+      color: Colors.transparent, // Make card transparent to show the gradient
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.white,
+              Colors.white.withAlpha(250),
+              Colors.grey.shade50.withAlpha(240),
+            ],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: controller.formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Welcome header
+                Builder(
+                  builder: (context) => Text(
+                    AppLocalizations.of(context)?.welcomeBack ?? 'Welcome Back',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.darkGreyColor,
                     ),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
-                    }
-                    if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
-                    }
-                    return null;
-                  },
-                  onFieldSubmitted: (_) => _attemptLogin(),
                 ),
-              ),
+                const SizedBox(height: 8),
+                Builder(
+                  builder: (context) => Text(
+                    AppLocalizations.of(context)?.signInContinue ??
+                        'Sign in to continue to your account',
+                    style: const TextStyle(
+                      color: AppTheme.greyColor,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
 
-              const SizedBox(height: 12),
-
-              // Remember me and forgot password
-              Row(
-                children: [
-                  // Remember me checkbox
-                  Obx(
-                    () => Checkbox(
-                      value: controller.rememberMe,
-                      onChanged: controller.toggleRememberMe,
-                      activeColor: AppTheme.primaryGreen,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
+                // Email field
+                Builder(
+                  builder: (context) => TextFormField(
+                    controller: controller.emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
+                    autocorrect: false,
+                    style: const TextStyle(color: Colors.black, fontSize: 16),
+                    decoration: InputDecoration(
+                      labelText:
+                          AppLocalizations.of(context)?.emailAddress ??
+                          'Email Address',
+                      hintText:
+                          AppLocalizations.of(context)?.enterEmail ??
+                          'Enter your admin email',
+                      prefixIcon: const Icon(Icons.email_outlined),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
                     ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return AppLocalizations.of(context)?.emailRequired ??
+                            'Please enter your email';
+                      }
+                      if (!GetUtils.isEmail(value)) {
+                        return AppLocalizations.of(context)?.emailInvalid ??
+                            'Please enter a valid email';
+                      }
+                      return null;
+                    },
                   ),
-                  const Text('Remember me', style: TextStyle(fontSize: 14)),
-
-                  const Spacer(),
-
-                  // Forgot password button
-                  TextButton(
-                    onPressed: controller.handlePasswordReset,
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                    ),
-                    child: const Text(
-                      'Forgot Password?',
-                      style: TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 24),
-
-              // Sign in button
-              Obx(
-                () => AnimatedGradientButton(
-                  onPressed: controller.isLoading ? null : _attemptLogin,
-                  isLoading: controller.isLoading,
-                  text: 'Sign In',
-                  gradient: const LinearGradient(
-                    colors: [AppTheme.darkGreen, AppTheme.primaryGreen],
-                  ),
-                  height: 54,
                 ),
-              ),
 
-              const SizedBox(height: 16),
+                const SizedBox(height: 20),
 
-              // Error message box
-              Obx(
-                () => Visibility(
-                  visible: controller.error.isNotEmpty,
-                  child: Container(
-                    margin: const EdgeInsets.only(top: 8),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.red.shade50,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.red.shade200),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.error_outline,
-                          color: Colors.red,
-                          size: 18,
+                // Password field
+                Obx(
+                  () => TextFormField(
+                    controller: controller.passwordController,
+                    obscureText: controller.obscurePassword,
+                    textInputAction: TextInputAction.done,
+                    style: const TextStyle(color: Colors.black, fontSize: 16),
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      hintText: 'Enter your secure password',
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          controller.obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                         ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            controller.error,
-                            style: TextStyle(
-                              color: Colors.red.shade700,
-                              fontSize: 12,
+                        onPressed: controller.togglePasswordVisibility,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your password';
+                      }
+                      if (value.length < 6) {
+                        return 'Password must be at least 6 characters';
+                      }
+                      return null;
+                    },
+                    onFieldSubmitted: (_) => _attemptLogin(),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                // Remember me and forgot password
+                Row(
+                  children: [
+                    // Remember me checkbox
+                    Obx(
+                      () => Checkbox(
+                        value: controller.rememberMe,
+                        onChanged: controller.toggleRememberMe,
+                        activeColor: AppTheme.primaryGreen,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                    ),
+                    const Text('Remember me', style: TextStyle(fontSize: 14)),
+
+                    const Spacer(),
+
+                    // Forgot password button
+                    TextButton(
+                      onPressed: controller.handlePasswordReset,
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                      ),
+                      child: const Text(
+                        'Forgot Password?',
+                        style: TextStyle(fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 24),
+
+                // Sign in button
+                Obx(
+                  () => AnimatedGradientButton(
+                    onPressed: controller.isLoading ? null : _attemptLogin,
+                    isLoading: controller.isLoading,
+                    text: 'Sign In',
+                    gradient: const LinearGradient(
+                      colors: [AppTheme.darkGreen, AppTheme.primaryGreen],
+                    ),
+                    height: 54,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Error message box
+                Obx(
+                  () => Visibility(
+                    visible: controller.error.isNotEmpty,
+                    child: Container(
+                      margin: const EdgeInsets.only(top: 8),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.red.shade200),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.error_outline,
+                            color: Colors.red,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              controller.error,
+                              style: TextStyle(
+                                color: Colors.red.shade700,
+                                fontSize: 12,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              // Security notice
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.only(top: 8),
-                  child: Text(
-                    'Authorized Dairy Personnel Only',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppTheme.greyColor,
-                      fontSize: 13,
-                      fontStyle: FontStyle.italic,
+                // Security notice
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 8),
+                    child: Text(
+                      'Authorized Dairy Personnel Only',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppTheme.greyColor,
+                        fontSize: 13,
+                        fontStyle: FontStyle.italic,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
