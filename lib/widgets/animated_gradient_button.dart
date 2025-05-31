@@ -39,7 +39,7 @@ class AnimatedGradientButton extends StatelessWidget {
         boxShadow: onPressed != null
             ? [
                 BoxShadow(
-                  color: Colors.green.shade200.withOpacity(0.5),
+                  color: Colors.green.shade200.withAlpha(128),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                   spreadRadius: 0,
@@ -52,7 +52,7 @@ class AnimatedGradientButton extends StatelessWidget {
         child: InkWell(
           onTap: isLoading ? null : onPressed,
           borderRadius: BorderRadius.circular(borderRadius),
-          splashColor: Colors.white.withOpacity(0.2),
+          splashColor: Colors.white.withAlpha(51),
           child: Center(
             child: isLoading
                 ? const SizedBox(
