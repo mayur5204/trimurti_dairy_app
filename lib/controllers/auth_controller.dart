@@ -133,7 +133,7 @@ class AuthController extends GetxController {
   // Constants for secure storage keys
   static const String _emailKey = 'dairy_app_email';
   static const String _rememberMeKey = 'dairy_app_remember_me';
-  
+
   // Instance of secure storage
   final _secureStorage = const FlutterSecureStorage();
 
@@ -142,7 +142,7 @@ class AuthController extends GetxController {
     try {
       final savedEmail = await _secureStorage.read(key: _emailKey);
       final savedRememberMe = await _secureStorage.read(key: _rememberMeKey);
-      
+
       if (savedEmail != null && savedRememberMe == 'true') {
         emailController.text = savedEmail;
         rememberMe.value = true;
@@ -157,7 +157,10 @@ class AuthController extends GetxController {
   Future<void> _saveCredentials() async {
     try {
       // Only save email for security reasons
-      await _secureStorage.write(key: _emailKey, value: emailController.text.trim());
+      await _secureStorage.write(
+        key: _emailKey,
+        value: emailController.text.trim(),
+      );
       await _secureStorage.write(key: _rememberMeKey, value: 'true');
     } catch (e) {
       debugPrint('Error saving credentials: ${e.toString()}');
