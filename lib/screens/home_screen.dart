@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import '../services/firebase_auth_service.dart';
+import 'customers/customer_list_screen.dart';
+import 'milk_types/milk_type_list_screen.dart';
+import 'sales/sale_list_screen.dart';
+import 'payments/payment_list_screen.dart';
 
 /// Home screen displayed after successful authentication
 class HomeScreen extends ConsumerStatefulWidget {
@@ -109,27 +113,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 crossAxisCount: 2,
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
+                childAspectRatio: 1.1,
                 children: [
                   _buildFeatureCard(
-                    icon: Icons.inventory,
-                    title: 'Inventory',
-                    subtitle: 'Manage milk stock',
+                    icon: Icons.local_drink,
+                    title: 'Milk Types',
+                    subtitle: 'Manage milk varieties',
                     color: Colors.blue,
-                    onTap: () => _showComingSoon('Inventory'),
+                    onTap: () => Get.to(() => const MilkTypeListScreen()),
                   ),
                   _buildFeatureCard(
                     icon: Icons.people,
                     title: 'Customers',
                     subtitle: 'Customer management',
                     color: Colors.orange,
-                    onTap: () => _showComingSoon('Customers'),
+                    onTap: () => Get.to(() => const CustomerListScreen()),
                   ),
                   _buildFeatureCard(
-                    icon: Icons.assignment,
-                    title: 'Orders',
-                    subtitle: 'Track orders',
+                    icon: Icons.shopping_cart,
+                    title: 'Sales',
+                    subtitle: 'Record sales',
                     color: Colors.purple,
-                    onTap: () => _showComingSoon('Orders'),
+                    onTap: () => Get.to(() => const SaleListScreen()),
+                  ),
+                  _buildFeatureCard(
+                    icon: Icons.payment,
+                    title: 'Payments',
+                    subtitle: 'Track payments',
+                    color: Colors.green,
+                    onTap: () => Get.to(() => const PaymentListScreen()),
                   ),
                   _buildFeatureCard(
                     icon: Icons.analytics,
@@ -137,13 +149,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     subtitle: 'Sales & analytics',
                     color: Colors.teal,
                     onTap: () => _showComingSoon('Reports'),
-                  ),
-                  _buildFeatureCard(
-                    icon: Icons.delivery_dining,
-                    title: 'Delivery',
-                    subtitle: 'Delivery routes',
-                    color: Colors.red,
-                    onTap: () => _showComingSoon('Delivery'),
                   ),
                   _buildFeatureCard(
                     icon: Icons.settings,

@@ -6,6 +6,7 @@ import 'firebase_options.dart';
 import 'services/firebase_auth_service.dart';
 import 'controllers/language_controller.dart';
 import 'controllers/login_controller.dart';
+import 'controllers/database_controller.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'l10n/app_localizations.dart';
@@ -18,7 +19,7 @@ void main() async {
 
   // Initialize Controllers
   Get.put(LanguageController());
-  // Initialize and retain LoginController to prevent disposal issues
+  Get.put(DatabaseController());
   Get.put(LoginController(), tag: 'login_controller', permanent: true);
 
   runApp(const ProviderScope(child: DairyApp()));
@@ -33,12 +34,12 @@ class DairyApp extends ConsumerWidget {
       builder: (languageController) => GetMaterialApp(
         title: 'Trimurti Dairy',
         debugShowCheckedModeBanner: false,
-        
+
         // Localization configuration
         locale: Locale(languageController.currentLanguageCode),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        
+
         initialRoute: '/',
         getPages: [
           GetPage(name: '/', page: () => const AuthWrapper()),
@@ -46,60 +47,60 @@ class DairyApp extends ConsumerWidget {
           GetPage(name: '/home', page: () => const HomeScreen()),
         ],
         theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.green,
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.green[700],
-          foregroundColor: Colors.white,
-          elevation: 0,
-        ),
-        cardTheme: CardThemeData(
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.green,
+            brightness: Brightness.light,
           ),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
+          useMaterial3: true,
+          appBarTheme: AppBarTheme(
             backgroundColor: Colors.green[700],
             foregroundColor: Colors.white,
+            elevation: 0,
+          ),
+          cardTheme: CardThemeData(
+            elevation: 4,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
           ),
-        ),
-      ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.green,
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.green[800],
-          foregroundColor: Colors.white,
-          elevation: 0,
-        ),
-        cardTheme: CardThemeData(
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green[700],
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
           ),
         ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green[700],
+        darkTheme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.green,
+            brightness: Brightness.dark,
+          ),
+          useMaterial3: true,
+          appBarTheme: AppBarTheme(
+            backgroundColor: Colors.green[800],
             foregroundColor: Colors.white,
+            elevation: 0,
+          ),
+          cardTheme: CardThemeData(
+            elevation: 4,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
           ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green[700],
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
         ),
-      ),
-      themeMode: ThemeMode.system,
+        themeMode: ThemeMode.system,
       ),
     );
   }

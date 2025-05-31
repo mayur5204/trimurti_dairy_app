@@ -79,6 +79,25 @@ applyTo: '**'
 5. **Documentation**: Add clear comments explaining complex logic
 6. **Review**: Final syntax and error check before completion
 
+## Database Development Phases
+- **Phase 1 (Current)**: Core database setup with basic tables and DAOs
+  - Create table definitions (Customer, MilkType, Sale, Payment)
+  - Setup basic CRUD operations
+  - Generate Drift code with build_runner
+  - Focus on structure over advanced features
+- **Phase 2 (Future)**: Advanced database features
+  - Complex JOIN queries and aggregations
+  - Database relationships and constraints
+  - Data validation and business logic
+- **Phase 3 (Future)**: Firebase integration and sync
+  - Implement offline-first sync logic
+  - Handle conflict resolution
+  - Background sync processes
+- **Phase 4 (Future)**: Testing and optimization
+  - Unit tests for database operations
+  - Performance optimization
+  - Database migration strategies
+
 ## Error Handling & Best Practices
 - Implement proper error handling with try-catch blocks
 - Use null safety features consistently
