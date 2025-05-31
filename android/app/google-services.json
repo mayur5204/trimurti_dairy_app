@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "635829133596",
+    "project_id": "trimurti-dairy-92591",
+    "storage_bucket": "trimurti-dairy-92591.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:635829133596:android:e251ef5d368e919dc79ad9",
+        "android_client_info": {
+          "package_name": "com.example.trimurti_dairy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdxKkxVNm0M9qZlXbexfmkmiQRrC9WyAA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
